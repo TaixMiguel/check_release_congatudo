@@ -34,8 +34,6 @@ jobs:
 
       - name: Obtención de la matriz de plataformas Docker
         id: matrix
-        #run: echo "::set-output name=matrix::$(jq -c . matrix-platforms-docker.json)"
-        #run: echo "::set-output name={name}::{value}"
         run: echo "matrix=$(jq -c . matrix-platforms-docker.json)" >> $GITHUB_OUTPUT
 
 #      - uses: rickstaa/action-create-tag@v1
@@ -75,6 +73,8 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ needs.create-tag-release.outputs.version }}
             ${{ env.REGISTRY }}/taixmiguel/congatudo-test:dev
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
           build-args: |
             "BUILD_FROM=${{ matrix.build_from }}"
             "PKG_TARGET=${{ matrix.pkg_target }}"
