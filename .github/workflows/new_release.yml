@@ -37,6 +37,7 @@ jobs:
   
   build-packages:
     name: Generación del paquete asociado a la release
+    needs: create-tag-release
     runs-on: ubuntu-latest
     steps:      
       - name: Inicio de sesión Docker
