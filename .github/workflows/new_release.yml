@@ -11,3 +11,25 @@ jobs:
       - uses: actions/checkout@v3
       - name: Descarga del fichero de versión
         run: wget https://raw.githubusercontent.com/TaixMiguel/Congatudo/${{ env.REMOTE_BRANCH }}/package.json
+
+      - uses: sergeysova/jq-action@v2
+        name: Obtención de la versión
+        id: version
+        with:
+          cmd: 'jq .version package.json -r'
+
+      - uses: rickstaa/action-create-tag@v1
+        name: Creación del tag
+        with:
+          tag: ${{ steps.version.outputs.value }}
+          message: Tag ${{ steps.version.outputs.value }}
+
+      - name: Creación de la release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.value }}
+          release_name: ${{ steps.version.outputs.value }}
+          draft: true
+          prerelease: false
