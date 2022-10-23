@@ -36,22 +36,22 @@ jobs:
         id: matrix
         run: echo "::set-output name=matrix::$(jq -c . matrix.json)"
 
-      - uses: rickstaa/action-create-tag@v1
-        name: Creación del tag
-        with:
-          tag: ${{ steps.version.outputs.value }}
-          message: Tag ${{ steps.version.outputs.value }}
+#      - uses: rickstaa/action-create-tag@v1
+#        name: Creación del tag
+#        with:
+#          tag: ${{ steps.version.outputs.value }}
+#          message: Tag ${{ steps.version.outputs.value }}
 
-      - name: Creación de la release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.version.outputs.value }}
-          release_name: ${{ steps.version.outputs.value }}
-          draft: false
-          prerelease: false
-  
+#      - name: Creación de la release
+#        uses: actions/create-release@latest
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: ${{ steps.version.outputs.value }}
+#          release_name: ${{ steps.version.outputs.value }}
+#          draft: false
+#          prerelease: false
+
   build-packages:
     name: Generación del paquete asociado a la release
     needs: create-tag-release
