@@ -8,6 +8,8 @@ jobs:
   create-tag-release:
     name: Creación del nuevo tag y release
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.value }}
     steps:
       - uses: actions/checkout@v3
       - name: Descarga del fichero de versión
@@ -52,6 +54,6 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ steps.version.outputs.value }}
+            ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ needs.create-tag-release.outputs.version }}
             ${{ env.REGISTRY }}/taixmiguel/congatudo-test:dev
           platforms: linux/amd64,linux/arm64
