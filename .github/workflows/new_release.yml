@@ -1,5 +1,8 @@
 name: Creación de nueva release
-on: [workflow_dispatch]
+#on: [workflow_dispatch]
+on:
+  push:
+    branches: [ main ]
 env:
   REMOTE_BRANCH: release
   REGISTRY: ghcr.io
@@ -69,13 +72,21 @@ jobs:
       - name: Construcción y subida de la imagen (amd64)
         uses: docker/build-push-action@v3
         with:
-          push: true
+          push: false
           tags: |
-            ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ needs.create-tag-release.outputs.version }}
-            ${{ env.REGISTRY }}/taixmiguel/congatudo-test:dev
+            ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ matrix.image_name }}-${{ needs.create-tag-release.outputs.version }}
+            ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ matrix.image_name }}-dev
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
           build-args: |
             "BUILD_FROM=${{ matrix.build_from }}"
             "PKG_TARGET=${{ matrix.pkg_target }}"
             "PKG_OPTIONS=${{ matrix.pkg_options }}"
+      - name: Push
+        run: |
+          docker push ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ matrix.image_name }}-${{ needs.create-tag-release.outputs.version }}
+          docker push ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ matrix.image_name }}-dev
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
