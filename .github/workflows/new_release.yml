@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.value }}
+      matrix: ${{ steps.matrix.outputs.value }}
     steps:
       - uses: actions/checkout@v3
       - name: Descarga del fichero de versión
@@ -20,6 +21,12 @@ jobs:
         id: version
         with:
           cmd: 'jq .version package.json -r'
+
+      - name: Obtención de la matriz de plataformas Docker
+        id: matrix
+        run: |
+          wget https://raw.githubusercontent.com/TaixMiguel/Congatudo/${{ env.REMOTE_BRANCH }}/matrix.json
+          echo "::set-output name=matrix::$(jq -c . matrix.json)"
 
       - uses: rickstaa/action-create-tag@v1
         name: Creación del tag
@@ -41,6 +48,8 @@ jobs:
     name: Generación del paquete asociado a la release
     needs: create-tag-release
     runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.create-tag-release.outputs.matrix) }}
     steps:      
       - name: Inicio de sesión Docker
         uses: docker/login-action@v2
@@ -56,13 +65,7 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ needs.create-tag-release.outputs.version }}
             ${{ env.REGISTRY }}/taixmiguel/congatudo-test:dev
-          platforms: linux/amd64
-
-      - name: Construcción y subida de la imagen (arm64)
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/taixmiguel/congatudo-test:${{ needs.create-tag-release.outputs.version }}
-            ${{ env.REGISTRY }}/taixmiguel/congatudo-test:dev
-          platforms: linux/arm64
+          build-args: |
+            "BUILD_FROM=${{ matrix.build_from }}"
+            "PKG_TARGET=${{ matrix.pkg_target }}"
+            "PKG_OPTIONS=${{ matrix.pkg_options }}"
