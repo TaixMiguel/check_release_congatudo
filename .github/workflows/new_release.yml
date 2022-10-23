@@ -9,5 +9,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        name: Descarga del fichero de versión
+      - name: Descarga del fichero de versión
         run: wget https://raw.githubusercontent.com/TaixMiguel/Congatudo/${{ env.REMOTE_BRANCH }}/package.json
