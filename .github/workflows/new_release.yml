@@ -107,8 +107,6 @@ build:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
-
   manifest:
     runs-on: ubuntu-latest
     name: Create and push manifest
